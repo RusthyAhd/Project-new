@@ -1,0 +1,168 @@
+postman api doc :- https://documenter.getpostman.com/view/32313729/2sAXxTcW8G
+
+Start commands :-
+    1) npm i
+    2) npm start
+
+✨ Go to env for change config
+
+======================================================================================
+
+📌 Auth
+
+📧 request otp - GET
+    ✨ http://localhost:3000/api/v1/auth/otp/0000000000
+    🎉 response - {
+                     "status": 200,
+                     "message": "OTP SEND SUCCESSFULLY 73330"
+                 }
+
+📧 verify OTP - POST
+     ✨ http://localhost:3000/api/v1/auth/otp/verify
+     ⚠️ request body
+        {
+            "phoneNumber":"0000000000",
+            "otp":"73330"
+        }
+     🎉 response
+        {
+            "status": 200,
+            "message": "OTP verified successfully",
+            "data": {
+                "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Il9pZCI6IjY3MGQwMDBlMGNkYTczYTA4YjA3NjcxZCIsImZ1bGxOYW1lIjoibmV3IHVzZXIiLCJwaG9uZU51bWJlciI6IjAwMDAwMDAwMDAiLCJlbWFpbCI6IiIsImJpcnRoZGF5IjpudWxsLCJnZW5kZXIiOiJPdGhlciIsImFkZHJlc3MiOiIiLCJsb2NhdGlvbiI6IiIsInByb2ZpbGVQaG90byI6IiIsIl9fdiI6MH0sImlhdCI6MTcyODkwNTk5MCwiZXhwIjoxNzI5NTEwNzkwfQ.wHDNHMOenJ5SN8Hwqb8X0TKSH3NTQwDVIC2My3L-e8o",
+                "user": {
+                    "_id": "670d000e0cda73a08b07671d",
+                    "fullName": "new user",
+                    "phoneNumber": "0000000000",
+                    "email": "",
+                    "birthday": null,
+                    "gender": "Other",
+                    "address": "",
+                    "location": "",
+                    "profilePhoto": "",
+                    "__v": 0
+                }
+            }
+        }
+
+------------------------------------------------------------------------------
+
+📌 Profile
+
+📧 Create or Update profile - POST
+
+    ✨ http://localhost:3000/api/v1/profile/cu
+    ⚠️ request body
+        {
+            "fullName": "Jane Doe",
+            "phoneNumber": "0000000000",
+            "email": "jane.doe@example.com",
+            "birthday": "1992-05-15T00:00:00.000Z",
+            "gender": "Female",
+            "address": "456 Elm Street",
+            "location": "Mathara",
+            "profilePhoto": "http://example.com/images/jane.jpg"
+        }
+    🎧 request headers
+        Authorization - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Il9pZCI6IjY3MGQwMDBlMGNkYTczYTA4YjA3NjcxZCIsImZ1bGxOYW1lIjoibmV3IHVzZXIiLCJwaG9uZU51bWJlciI6IjAwMDAwMDAwMDAiLCJlbWFpbCI6IiIsImJpcnRoZGF5IjpudWxsLCJnZW5kZXIiOiJPdGhlciIsImFkZHJlc3MiOiIiLCJsb2NhdGlvbiI6IiIsInByb2ZpbGVQaG90byI6IiIsIl9fdiI6MH0sImlhdCI6MTcyODkwNTk5MCwiZXhwIjoxNzI5NTEwNzkwfQ.wHDNHMOenJ5SN8Hwqb8X0TKSH3NTQwDVIC2My3L-e8o
+    🎉 response
+        {
+            "status": true,
+            "success": "Profile updated successfully",
+            "data": {
+                "_id": "670d000e0cda73a08b07671d",
+                "fullName": "Jane Doe",
+                "phoneNumber": "0000000000",
+                "email": "jane.doe@example.com",
+                "birthday": "1992-05-15T00:00:00.000Z",
+                "gender": "Female",
+                "address": "456 Elm Street",
+                "location": "Mathara",
+                "profilePhoto": "",
+                "__v": 0
+            }
+        }
+
+------------------------------------------------------------------------------
+
+📌 Service-providers
+
+📧 Get by category and location - GET
+
+    ✨ http://localhost:3000/api/v1/service/service-providers/category/location
+    ⚠️ request body
+        {
+            "category":"Other",
+            "location":"Trincomalee"
+        }
+    🎧 request headers
+            Authorization - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Il9pZCI6IjY3MGQwMDBlMGNkYTczYTA4YjA3NjcxZCIsImZ1bGxOYW1lIjoibmV3IHVzZXIiLCJwaG9uZU51bWJlciI6IjAwMDAwMDAwMDAiLCJlbWFpbCI6IiIsImJpcnRoZGF5IjpudWxsLCJnZW5kZXIiOiJPdGhlciIsImFkZHJlc3MiOiIiLCJsb2NhdGlvbiI6IiIsInByb2ZpbGVQaG90byI6IiIsIl9fdiI6MH0sImlhdCI6MTcyODkwNTk5MCwiZXhwIjoxNzI5NTEwNzkwfQ.wHDNHMOenJ5SN8Hwqb8X0TKSH3NTQwDVIC2My3L-e8o
+    🎉 response
+        {
+            "status": 200,
+            "message": "Service providers for category: Other",
+            "data": [
+                {
+                    "_id": "670ac93cade3fd0d3244a1c9",
+                    "name": "Rishaf",
+                    "service_title": "Bussinesman",
+                    "phone": "0755354023",
+                    "address": "kinniya2",
+                    "location": "Trincomalee",
+                    "email": "risaf0227@gmail.com",
+                    "category": "Other",
+                    "createdAt": "2024-10-12T19:08:44.177Z",
+                    "updatedAt": "2024-10-12T19:08:44.177Z",
+                    "__v": 0
+                },
+                {
+                    "_id": "670bca44dd5456c8e30079a2",
+                    "name": "h",
+                    "service_title": "hhh",
+                    "phone": "0755596127",
+                    "address": "kk",
+                    "location": "Trincomalee",
+                    "email": "hh@gmail.com",
+                    "category": "Other",
+                    "createdAt": "2024-10-13T13:25:24.897Z",
+                    "updatedAt": "2024-10-13T13:25:24.897Z",
+                    "__v": 0
+                }
+            ]
+        }
+
+------------------------------------------------------------------------------
+
+📌 Shop owner
+
+📧 Get shops by location and category - GET
+
+    ✨ http://localhost:3000/api/v1/shop/get/all/category/location
+    ⚠️ request body
+        {
+            "category":"Phone Accessories",
+            "location":"Trincomalee"
+        }
+    🎧 request headers
+                Authorization - eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7Il9pZCI6IjY3MGQwMDBlMGNkYTczYTA4YjA3NjcxZCIsImZ1bGxOYW1lIjoibmV3IHVzZXIiLCJwaG9uZU51bWJlciI6IjAwMDAwMDAwMDAiLCJlbWFpbCI6IiIsImJpcnRoZGF5IjpudWxsLCJnZW5kZXIiOiJPdGhlciIsImFkZHJlc3MiOiIiLCJsb2NhdGlvbiI6IiIsInByb2ZpbGVQaG90byI6IiIsIl9fdiI6MH0sImlhdCI6MTcyODkwNTk5MCwiZXhwIjoxNzI5NTEwNzkwfQ.wHDNHMOenJ5SN8Hwqb8X0TKSH3NTQwDVIC2My3L-e8o
+    🎉 response
+        {
+            "status": 200,
+            "message": "Shop owners for category: Phone Accessories and location: Trincomalee",
+            "data": [
+                {
+                    "_id": "670bd1f9e3b5b5843434b9f4",
+                    "name": "tyre",
+                    "shop_name": "tyr",
+                    "phone": "0789876543",
+                    "address": "hty",
+                    "location": "Trincomalee",
+                    "email": "er@gmail.com",
+                    "category": "Phone Accessories",
+                    "password": "$2b$10$fFHZcCTzaOpUQyT8ioQnNeQnmqGxpu9aYDid9uA9g0LDYP/MbNxmG",
+                    "createdAt": "2024-10-13T13:58:17.142Z",
+                    "updatedAt": "2024-10-13T13:58:17.142Z",
+                    "__v": 0
+                }
+            ]
+        }
