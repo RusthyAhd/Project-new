@@ -1,17 +1,64 @@
 import 'package:flutter/material.dart';
-
-import 'package:tap_on/Enter%20Number%20Page.dart';
+import 'package:http/http.dart' as http;
+import 'package:tap_on/Providers/FilteredProvidersPage.dart';
 import 'package:tap_on/Toollogin.dart';
+import 'dart:convert'; // For JSON handling
 import 'package:tap_on/Users/Notification.dart';
-import 'package:tap_on/Users/edit%20profile.dart'; // Ensure ProfilePage exists here
+import 'package:tap_on/Users/edit%20profile.dart';
 import 'package:tap_on/Servicelogin.dart';
 import 'package:tap_on/user-renttools/Tool%20location.dart';
-
 import 'package:tap_on/user-services/location.dart';
 import 'package:tap_on/Users/Chatbot.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool isLoading = false;
+  String errorMessage = '';
+
+  // Fetch Service Providers by Category
+  Future<void> fetchProvidersByCategory(String category) async {
+    setState(() {
+      isLoading = true;
+      errorMessage = '';
+    });
+
+    try {
+      final response = await http.get(
+        Uri.parse('http://localhost:3000/api/v1/service/service-providers/category/$category'),
+      );
+
+      if (response.statusCode == 200) {
+        final List<dynamic> serviceProviders = json.decode(response.body)['data'] ?? [];
+        
+        // Navigate to FilteredProvidersPage with the fetched service providers
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => FilteredProvidersPage(providers: serviceProviders),
+          ),
+        );
+      } else {
+        setState(() {
+          errorMessage = 'Failed to load service providers: ${response.reasonPhrase}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Error: $e';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,21 +66,12 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('TapOn'),
         backgroundColor: Colors.amber[700],
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const Enternumber()));
-          },
-        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
             onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const NotificationPage()));
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const NotificationPage()));
             },
           ),
         ],
@@ -43,15 +81,14 @@ class HomePage extends StatelessWidget {
           const SizedBox(height: 20),
           ListTile(
             leading: const CircleAvatar(
-              backgroundImage: AssetImage(
-                  'assets/profile.jpg'), // Replace with profile image
+              backgroundImage: AssetImage('assets/profile.jpg'),
             ),
             title: TextButton(
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => ProfilePage()));
               },
-              child: const Text("Profile"), // Add text to the button
+              child: const Text("Profile"),
             ),
             trailing: IconButton(
               icon: const Icon(Icons.support_agent),
@@ -87,106 +124,40 @@ class HomePage extends StatelessWidget {
                     icon: Icons.plumbing,
                     label: 'Plumber',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
+                      fetchProvidersByCategory('Plumber');
                     },
                   ),
                   ServiceCard(
-                    icon: Icons.electrical_services,
-                    label: 'Electrician',
+                    icon: Icons.face,
+                    label: 'Beauty',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
+                      fetchProvidersByCategory('Beauty');
                     },
                   ),
                   ServiceCard(
-                    icon: Icons.construction,
-                    label: 'Carpenter',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
-                    },
-                  ),
-                  ServiceCard(
-                    icon: Icons.format_paint,
-                    label: 'Painter',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
-                    },
-                  ),
-                  ServiceCard(
-                    icon: Icons.grass,
-                    label: 'Gardener',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
-                    },
-                  ),
-                  ServiceCard(
-                    icon: Icons.kitchen,
-                    label: 'Fridge Repair',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
-                    },
-                  ),
-                  ServiceCard(
-                    icon: Icons.build,
-                    label: 'Beauty Professional',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
-                    },
-                  ),
-                  ServiceCard(
-                    icon: Icons.phone_android,
+                    icon: Icons.phone_iphone,
                     label: 'Phone Repair',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
+                      fetchProvidersByCategory('Phone Repair');
                     },
                   ),
                   ServiceCard(
-                    icon: Icons.content_cut,
+                    icon: Icons.miscellaneous_services,
                     label: 'Other',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LocationScreen()),
-                      );
+                      fetchProvidersByCategory('Other');
                     },
                   ),
+                  // Add more services as needed
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          // Loading Indicator
+          if (isLoading) const CircularProgressIndicator(),
+          if (errorMessage.isNotEmpty)
+            Text(errorMessage, style: TextStyle(color: Colors.red)),
+                     const SizedBox(height: 20),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.0),
             child: Text(
@@ -361,18 +332,20 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-}
+} 
+     
 
 class ServiceCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback onTap;
 
-  const ServiceCard(
-      {super.key,
-      required this.icon,
-      required this.label,
-      required this.onTap});
+  const ServiceCard({
+    Key? key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

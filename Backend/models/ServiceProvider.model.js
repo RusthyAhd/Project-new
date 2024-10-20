@@ -14,6 +14,6 @@ const ServiceProviderSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Check if the model is already compiled to prevent OverwriteModelError
-const ServiceProviderModel = mongoose.models.ServiceProviderdetail || mongoose.model('ServiceProviderdetail', ServiceProviderSchema);
+const ServiceProviderModel = mongoose.models.serviceproviderdetails || mongoose.model('serviceproviderdetails', ServiceProviderSchema);
 
 module.exports = ServiceProviderModel;

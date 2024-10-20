@@ -55,7 +55,7 @@ class _VerificationScreenState extends State<VerificationScreen> {
         // Navigate to home page
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) =>  HomePage()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
