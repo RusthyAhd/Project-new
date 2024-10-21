@@ -87,9 +87,9 @@ class _ServiceProviderRegistrationFormState
       };
 
       try {
-        // API call for service provider registration
+        // API call for service provider registration        
         var response = await http.post(
-          Uri.parse('http://localhost:3000/serviceregistration'),
+          Uri.parse('http://localhost:3000/api/v1/service/serviceregistration'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode(providerData),
         );

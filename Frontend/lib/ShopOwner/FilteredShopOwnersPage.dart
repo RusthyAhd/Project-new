@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tap_on/Providers/ServiceProviderDEtailsPage.dart';
+import 'package:tap_on/ShopOwner/ShopOwnerDetailPage.dart';
 
-class FilteredProvidersPage extends StatefulWidget {
-  final List<dynamic> providers;
+class FilteredShopOwnersPage extends StatefulWidget {
+  final List<dynamic> shopOwners;
 
-  const FilteredProvidersPage({Key? key, required this.providers})
+  const FilteredShopOwnersPage({Key? key, required this.shopOwners})
       : super(key: key);
 
   @override
-  _FilteredProvidersPageState createState() => _FilteredProvidersPageState();
+  _FilteredShopOwnersPageState createState() => _FilteredShopOwnersPageState();
 }
 
-class _FilteredProvidersPageState extends State<FilteredProvidersPage> {
-  List<dynamic> filteredProviders = [];
+class _FilteredShopOwnersPageState extends State<FilteredShopOwnersPage> {
+  List<dynamic> filteredShopOwners = [];
   String selectedLocation = '';
 
   // List of locations for filtering
@@ -48,21 +48,21 @@ class _FilteredProvidersPageState extends State<FilteredProvidersPage> {
   @override
   void initState() {
     super.initState();
-    // Initially, show all providers
-    filteredProviders = widget.providers;
+    // Initially, show all shop owners
+    filteredShopOwners = widget.shopOwners;
   }
 
-  // Function to filter providers by selected location
-  void filterProvidersByLocation(String location) {
+  // Function to filter shop owners by selected location
+  void filterShopOwnersByLocation(String location) {
     setState(() {
       selectedLocation = location;
       if (location == 'All') {
-        // Show all providers if 'All' is selected
-        filteredProviders = widget.providers;
+        // Show all shop owners if 'All' is selected
+        filteredShopOwners = widget.shopOwners;
       } else {
-        // Filter providers by location
-        filteredProviders = widget.providers.where((provider) {
-          return provider['location'] == location;
+        // Filter shop owners by location
+        filteredShopOwners = widget.shopOwners.where((shopOwner) {
+          return shopOwner['location'] == location;
         }).toList();
       }
     });
@@ -72,7 +72,7 @@ class _FilteredProvidersPageState extends State<FilteredProvidersPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Filtered Service Providers'),
+        title: const Text('Shop Owners'),
         backgroundColor: Colors.amber[700],
       ),
       body: Column(
@@ -87,7 +87,7 @@ class _FilteredProvidersPageState extends State<FilteredProvidersPage> {
               iconEnabledColor: Colors.amber[700],
               onChanged: (String? newValue) {
                 if (newValue != null) {
-                  filterProvidersByLocation(newValue);
+                  filterShopOwnersByLocation(newValue);
                 }
               },
               items: locations.map<DropdownMenuItem<String>>((String value) {
@@ -99,15 +99,16 @@ class _FilteredProvidersPageState extends State<FilteredProvidersPage> {
             ),
           ),
           Expanded(
-            child: filteredProviders.isEmpty
+            child: filteredShopOwners.isEmpty
                 ? const Center(
-                    child: Text('No providers found',
+                    child: Text('No shop owners found',
                         style: TextStyle(
                             fontSize: 18, fontWeight: FontWeight.bold)),
                   )
                 : ListView.builder(
-                    itemCount: filteredProviders.length,
+                    itemCount: filteredShopOwners.length,
                     itemBuilder: (context, index) {
+                      final shopOwner = filteredShopOwners[index];
                       return Card(
                         elevation: 2,
                         margin: const EdgeInsets.symmetric(
@@ -115,31 +116,22 @@ class _FilteredProvidersPageState extends State<FilteredProvidersPage> {
                         child: ListTile(
                           contentPadding: const EdgeInsets.all(16.0),
                           title: Text(
-                            filteredProviders[index]['name'],
-                            style: const TextStyle(
-                                fontWeight: FontWeight.bold),
+                            shopOwner['shop_name'],
+                            style: const TextStyle(fontWeight: FontWeight.bold),
                           ),
                           subtitle: Text(
-                            filteredProviders[index]['service_title'],
+                            shopOwner['description'],
                           ),
-                          trailing: ElevatedButton(
-                            onPressed: () {
-                              // Navigate to the provider details page
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ServiceProviderDetailPage(
-                                    provider: filteredProviders[index],
-                                  ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ShopOwnerDetailPage(
+                                  shopOwner: filteredShopOwners[index],
                                 ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.black,
-                              foregroundColor: Colors.amber[700],
-                            ),
-                            child: const Text('Choose'),
-                          ),
+                              ),
+                            );
+                          },
                         ),
                       );
                     },

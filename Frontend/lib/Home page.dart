@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:tap_on/Providers/FilteredProvidersPage.dart';
+import 'package:tap_on/ShopOwner/FilteredShopOwnersPage.dart';
 import 'package:tap_on/Toollogin.dart';
 import 'dart:convert'; // For JSON handling
 import 'package:tap_on/Users/Notification.dart';
@@ -59,6 +60,47 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+  //fetsh shops
+Future<void> fetchShopOwnersByCategory(String category) async {
+  setState(() {
+    isLoading = true;
+    errorMessage = '';
+  });
+
+  try {
+    final response = await http.get(
+      Uri.parse('http://localhost:3000/api/v1/shop/shop-shopowners/category/$category'),
+    );
+
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final List<dynamic> shopOwners = json.decode(response.body)['data'] ?? [];
+
+      // Navigate to FilteredShopOwnersPage with the fetched shop owners
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FilteredShopOwnersPage(shopOwners: shopOwners),
+        ),
+      );
+    } else {
+      setState(() {
+        errorMessage = 'Failed to load shop owners: ${response.reasonPhrase}';
+      });
+    }
+  } catch (e) {
+    setState(() {
+      errorMessage = 'Error: $e';
+    });
+  } finally {
+    setState(() {
+      isLoading = false;
+    });
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -128,26 +170,56 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                   ServiceCard(
-                    icon: Icons.face,
-                    label: 'Beauty',
+                    icon: Icons.plumbing,
+                    label: 'Electrician',
                     onTap: () {
-                      fetchProvidersByCategory('Beauty');
+                      fetchProvidersByCategory('Electrician');
                     },
                   ),
                   ServiceCard(
-                    icon: Icons.phone_iphone,
+                    icon: Icons.plumbing,
+                    label: 'Carpenter',
+                    onTap: () {
+                      fetchProvidersByCategory('Carpenter');
+                    },
+                  ),ServiceCard(
+                    icon: Icons.plumbing,
+                    label: 'Painter',
+                    onTap: () {
+                      fetchProvidersByCategory('Painter');
+                    },
+                  ),ServiceCard(
+                    icon: Icons.plumbing,
+                    label: 'Gardener',
+                    onTap: () {
+                      fetchProvidersByCategory('Gardener');
+                    },
+                  ),ServiceCard(
+                    icon: Icons.plumbing,
+                    label: 'Fridge Repair',
+                    onTap: () {
+                      fetchProvidersByCategory('Fridge Repair');
+                    },
+                  ),ServiceCard(
+                    icon: Icons.plumbing,
+                    label: 'Beauty Professional',
+                    onTap: () {
+                      fetchProvidersByCategory('Beauty Professional');
+                    },
+                  ),ServiceCard(
+                    icon: Icons.plumbing,
                     label: 'Phone Repair',
                     onTap: () {
                       fetchProvidersByCategory('Phone Repair');
                     },
-                  ),
-                  ServiceCard(
-                    icon: Icons.miscellaneous_services,
+                  ),ServiceCard(
+                    icon: Icons.plumbing,
                     label: 'Other',
                     onTap: () {
                       fetchProvidersByCategory('Other');
                     },
                   ),
+                                 
                   // Add more services as needed
                 ],
               ),
@@ -161,7 +233,7 @@ class _HomePageState extends State<HomePage> {
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.0),
             child: Text(
-              'Rent Tools',
+              'Choose Shop Owner',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
@@ -179,105 +251,73 @@ class _HomePageState extends State<HomePage> {
                     icon: Icons.plumbing,
                     label: 'Plumbing Tools',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                      fetchShopOwnersByCategory('Plumbing Tools');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.electrical_services,
                     label: 'Electrical Tools',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                   onTap: () {
+                      fetchShopOwnersByCategory('Electrical Tools');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.construction,
                     label: 'Carpenting Tools',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                      fetchShopOwnersByCategory('Carpenting Tools');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.format_paint,
                     label: 'Painting Tools',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                   onTap: () {
+                      fetchShopOwnersByCategory('Painting Tools');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.grass,
                     label: 'Gardening Tools',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                      fetchShopOwnersByCategory('Gardening Tools');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.kitchen,
                     label: 'Repairing Tools',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                   onTap: () {
+                      fetchShopOwnersByCategory('Repairing Tools');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.build,
                     label: 'Building Tools',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                      fetchShopOwnersByCategory('Building Tools');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.phone_android,
                     label: 'Phone Accessories',
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                   onTap: () {
+                      fetchShopOwnersByCategory('Phone Accessories');
                     },
                   ),
                   ServiceCard(
                     icon: Icons.content_cut,
                     label: 'Other',
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TLocationPage()),
-                      );
+                      fetchShopOwnersByCategory('Other');
                     },
                   ),
                 ],
               ),
             ),
           ),
+         // Loading Indicator
+          if (isLoading) const CircularProgressIndicator(),
+          if (errorMessage.isNotEmpty)
+            Text(errorMessage, style: const TextStyle(color: Colors.red)), 
         ],
       ),
       bottomNavigationBar: BottomAppBar(

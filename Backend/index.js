@@ -25,7 +25,7 @@ app.use(urlencoded({ extended: true }));
 mongoose.set('debug', true);
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://rusthy2001:rusthy.01122001@tapon-atlas.9qjax.mongodb.net/Tapon-DB?retryWrites=true&w=majority&appName=TapOn-Atlas')
+mongoose.connect('mongodb+srv://Him2001:Him%402001@project.sjhvm.mongodb.net/')
     .then(() => console.log('MongoDB Successfully Connected with TapOn-DB'))
     .catch(error => {
         console.error('MongoDB Connection Error:', error.message);

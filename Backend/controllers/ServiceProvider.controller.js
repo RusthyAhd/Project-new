@@ -14,7 +14,7 @@ exports.serviceregister = async (req, res, next) => {
                     400,
                     'All fields are required'
                 )
-            );
+            )
         }
 
         // Check for existing phone or email
@@ -25,7 +25,7 @@ exports.serviceregister = async (req, res, next) => {
                     400,
                     'Phone or email already exists'
                 )
-            );
+            )
         }
 
         // Hash the password
@@ -54,7 +54,7 @@ exports.serviceregister = async (req, res, next) => {
                 `Service provider registered successfully`,
                 savedServiceProvider
             )
-        );
+        )
     } catch (error) {
         console.error(error);
 
@@ -63,12 +63,13 @@ exports.serviceregister = async (req, res, next) => {
                 404,
                 'Registration failed. Try again later.'
             )
-        );
+        )
     }
 };
 
 // Get Service Providers by Category (No Location Filter)
 exports.getServiceProvidersByCategory = async (req, res, next) => {
+
     try {
         const { category } = req.params;
 
@@ -79,7 +80,7 @@ exports.getServiceProvidersByCategory = async (req, res, next) => {
                     400,
                     'Please provide a category'
                 )
-            );
+            )
         }
 
         // Find all service providers with the specified category
@@ -91,7 +92,7 @@ exports.getServiceProvidersByCategory = async (req, res, next) => {
                     404,
                     `No service providers found for category: ${category}`
                 )
-            );
+            )
         }
 
         // Send the list of service providers
@@ -101,7 +102,7 @@ exports.getServiceProvidersByCategory = async (req, res, next) => {
                 `Service providers for category: ${category}`,
                 serviceProviders
             )
-        );
+        )
 
     } catch (error) {
         console.error(error);
@@ -110,6 +111,6 @@ exports.getServiceProvidersByCategory = async (req, res, next) => {
                 404,
                 'Failed to fetch service providers'
             )
-        );
+        )
     }
 };

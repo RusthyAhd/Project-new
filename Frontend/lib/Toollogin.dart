@@ -87,7 +87,7 @@ class TLoginPage extends StatelessWidget {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => ShopOwnerRegistration()));
+                          builder: (context) => ShopOwnerRegistrationForm()));
                 },
                 child: Text('Register as Shop Owner'),
                 style: OutlinedButton.styleFrom(

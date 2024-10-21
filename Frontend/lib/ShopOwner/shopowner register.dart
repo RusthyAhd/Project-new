@@ -1,27 +1,31 @@
-import 'package:flutter/material.dart';
-import 'package:tap_on/ShopOwner/ShopOwnerDashboard.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:tap_on/ShopOwner/ShopOwnerDashboard.dart';
 
-class ShopOwnerRegistration extends StatefulWidget {
-  const ShopOwnerRegistration({super.key});
-
+class ShopOwnerRegistrationForm extends StatefulWidget {
+  const ShopOwnerRegistrationForm({super.key});
+  
   @override
-  _ShopOwnerRegistrationState createState() => _ShopOwnerRegistrationState();
+  _ShopOwnerRegistrationFormState createState() =>
+      _ShopOwnerRegistrationFormState();
 }
 
-class _ShopOwnerRegistrationState extends State<ShopOwnerRegistration> {
-  // Create controllers for each TextField
+class _ShopOwnerRegistrationFormState extends State<ShopOwnerRegistrationForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  // Controllers for form fields
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController shopNameController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
+  final TextEditingController descriptionController = TextEditingController();
 
-  List<String> genderOptions = [
+  List<String> locationOptions = [
     "Colombo",
     "Gampaha",
     "Kalutara",
@@ -49,49 +53,53 @@ class _ShopOwnerRegistrationState extends State<ShopOwnerRegistration> {
     "Monaragala",
   ];
 
-  String selectedGender = "";
-  bool isAgreed = false; // Track if the user has agreed to the terms
-  final _formKey = GlobalKey<FormState>(); // Form key for validation
-
-  String? selectedCategory; // Variable to hold the selected category
-
-  // List of categories for the dropdown
+  String selectedLocation = "";
+  String? selectedCategory; // To store selected category
   final List<String> categories = [
     'Plumbing Tools',
     'Electrical Tools',
-    'Carpenting Tools',
+    'Carpentry Tools',
     'Painting Tools',
     'Gardening Tools',
     'Repairing Tools',
     'Building Tools',
     'Phone Accessories',
-    'Other',
-  ];
+    'Other'
+  ]; // Category list
 
-  // Function to handle the submission of form data
-  Future<void> registerOwner() async {
+  bool isAgreed = false;
+
+  // Method to handle registration process
+  Future<void> registerShopOwner() async {
     if (_formKey.currentState!.validate() && isAgreed) {
-      // Prepare the data for submission
-      Map<String, String> shopownerData = {
+      if (selectedCategory == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a category.')),
+        );
+        return; // Exit if category is not selected
+      }
+
+      // Preparing the data to send to backend
+      Map<String, String> shopOwnerData = {
         'name': nameController.text,
         'shop_name': shopNameController.text,
         'phone': phoneController.text,
         'address': addressController.text,
-        'location': selectedGender,
+        'location': selectedLocation,
         'email': emailController.text,
-        'category': selectedCategory ?? '',
+        'category': selectedCategory!, // Now it's safe to use !
+        'description': descriptionController.text,
         'password': passwordController.text,
-        'confirmPassword': confirmPasswordController.text,
       };
 
-      print('Submitting data: $shopownerData'); // Debug print
-
       try {
-        // Send POST request to backend with user data
+        var apiUrl = 'http://localhost:3000/api/v1/shop/registration';
+
+        // API call for shop owner registration
         var response = await http.post(
-          Uri.parse('http://localhost:3000/shopregistration'),
+          Uri.parse(apiUrl),
           headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(shopownerData),
+          body: jsonEncode(shopOwnerData),
         );
 
         if (response.statusCode == 200) {
@@ -102,15 +110,13 @@ class _ShopOwnerRegistrationState extends State<ShopOwnerRegistration> {
               builder: (context) => ShopdashboardPage(),
             ),
           );
-          print('Shopowner Details successfully Registered');
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Registration successful!')),
           );
         } else {
           // Handle error from the backend
           print('Failed to save data. Status code: ${response.statusCode}');
-          print(
-              'Response body: ${response.body}'); // Print response body for more info
+          print('Response Body: ${response.body}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Failed to save data: ${response.body}')),
           );
@@ -121,6 +127,11 @@ class _ShopOwnerRegistrationState extends State<ShopOwnerRegistration> {
           const SnackBar(content: Text('Error occurred while submitting data')),
         );
       }
+    } else if (!isAgreed) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('You must agree to the terms and conditions')),
+      );
     }
   }
 
@@ -129,171 +140,185 @@ class _ShopOwnerRegistrationState extends State<ShopOwnerRegistration> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.yellow[700],
-        title: const Text(
-          'Shop Owner Registration',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
+        title: const Text('Shop Owner Registration'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey, // Assign the form key
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _buildTextField(
-                  controller: nameController,
-                  labelText: 'Name',
-                  hintText: 'Enter your name',
-                  icon: Icons.person,
-                ),
-                _buildTextField(
-                  controller: shopNameController,
-                  labelText: 'Shop Name',
-                  hintText: 'Enter your shop name',
-                  icon: Icons.store,
-                ),
-                _buildTextField(
-                  controller: phoneController,
-                  labelText: 'Phone Number',
-                  hintText: 'Enter your phone number',
-                  icon: Icons.phone,
-                  keyboardType: TextInputType.phone,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your phone number';
-                    } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
-                      return 'Enter a valid 10-digit phone number';
-                    }
-                    return null;
-                  },
-                ),
-                _buildTextField(
-                  controller: addressController,
-                  labelText: 'Address',
-                  hintText: 'Enter your address',
-                  icon: Icons.home,
-                ),
-                _buildDropdownField(
-                  labelText: 'Select Your District',
-                  hintText: 'Select your district',
-                  value: selectedGender.isNotEmpty ? selectedGender : null,
-                  items: genderOptions,
-                  icon: Icons.location_on,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedGender = value!;
-                    });
-                  },
-                ),
-                _buildTextField(
-                  controller: emailController,
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
-                  icon: Icons.email,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
-                    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$')
-                        .hasMatch(value)) {
-                      return 'Enter a valid email address';
-                    }
-                    return null;
-                  },
-                ),
-                _buildTextField(
-                  controller: passwordController,
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                  icon: Icons.lock,
-                  obscureText: true,
-                ),
-                _buildTextField(
-                  controller: confirmPasswordController,
-                  labelText: 'Confirm Password',
-                  hintText: 'Re-enter your password',
-                  icon: Icons.lock,
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please confirm your password';
-                    } else if (value != passwordController.text) {
-                      return 'Passwords do not match';
-                    }
-                    return null;
-                  },
-                ),
-                _buildDropdownField(
-                  labelText: 'Category',
-                  hintText: 'Select your category',
-                  value: selectedCategory,
-                  items: categories,
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      selectedCategory = newValue;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please select a category';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 20),
-                const Text('Terms and Conditions',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 10),
-                const Text(
-                  'By using the Handyman App, you agree to these terms. Provide '
-                  'accurate information during registration. You are responsible for '
-                  'keeping your account details secure. Must ensure tools are '
-                  'described accurately, safe, and functional. The app only connects '
-                  'users and providers. We are not responsible for the quality or '
-                  'outcome of services or tools provided.',
-                  style: TextStyle(fontSize: 12),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: <Widget>[
-                    const Text('Do You Agree?',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 5),
-                    Checkbox(
-                      value: isAgreed,
-                      onChanged: (bool? value) {
-                        setState(() {
-                          isAgreed = value ?? false;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 15),
-                Center(
-                  child: ElevatedButton(
-                    onPressed: isAgreed ? registerOwner : null,
-                    child: const Text('Continue'),
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.black,
-                      backgroundColor: Colors.yellow[700],
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 30),
-                      textStyle: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.bold),
-                    ).copyWith(elevation: ButtonStyleButton.allOrNull(5)),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField(
+                controller: nameController,
+                labelText: 'Name',
+                hintText: 'Enter your name',
+                icon: Icons.person,
+              ),
+              const SizedBox(height: 16.0),
+              _buildTextField(
+                controller: shopNameController,
+                labelText: 'Shop Name',
+                hintText: 'Enter your shop name',
+                icon: Icons.store,
+              ),
+              const SizedBox(height: 16.0),
+              _buildTextField(
+                controller: phoneController,
+                labelText: 'Phone Number',
+                hintText: 'Enter your phone number',
+                keyboardType: TextInputType.phone,
+                icon: Icons.phone,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your phone number';
+                  } else if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                    return 'Enter a valid 10-digit phone number';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              _buildTextField(
+                controller: addressController,
+                labelText: 'Address',
+                hintText: 'Enter your address',
+                icon: Icons.home,
+              ),
+              const SizedBox(height: 16.0),
+              _buildDropdownField(
+                labelText: "Select Your District",
+                hintText: 'Choose your district',
+                value: selectedLocation.isNotEmpty ? selectedLocation : null,
+                items: locationOptions,
+                icon: Icons.location_on,
+                onChanged: (value) {
+                  setState(() {
+                    selectedLocation = value!;
+                  });
+                },
+              ),
+              const SizedBox(height: 16.0),
+              _buildTextField(
+                controller: emailController,
+                labelText: 'Email',
+                hintText: 'Enter your email',
+                icon: Icons.email,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your email';
+                  } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return 'Enter a valid email address';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              _buildTextField(
+                controller: passwordController,
+                labelText: 'Password',
+                hintText: 'Enter your password',
+                obscureText: true,
+                icon: Icons.lock,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please enter your password';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              _buildTextField(
+                controller: confirmPasswordController,
+                labelText: 'Confirm Password',
+                hintText: 'Re-enter your password',
+                obscureText: true,
+                icon: Icons.lock,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please confirm your password';
+                  } else if (value != passwordController.text) {
+                    return 'Passwords do not match';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              _buildTextField(
+                controller: descriptionController,
+                labelText: 'Description',
+                hintText: 'Enter a brief description of your shop or services',
+                maxLines: 3,
+                icon: Icons.description,
+              ),
+
+              const SizedBox(height: 16.0),
+              // Dropdown for category selection
+              _buildDropdownField(
+                labelText: 'Select Category',
+                hintText: 'Choose your category',
+                value: selectedCategory,
+                items: categories,
+                icon: Icons.category,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedCategory = newValue;
+                  });
+                },
+                validator: (value) {
+                  if (value == null) {
+                    return 'Please select a category';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16.0),
+              const Text('Terms and Conditions',
+                  style: TextStyle(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              const Text(
+                'By using the Handyman App, you agree to provide accurate '
+                'information during registration and to keep your account secure. '
+                'You must ensure your tools are described accurately, safe, and '
+                'functional. The app connects users and shop owners, but we are '
+                'not responsible for the quality or outcome of tools rented. '
+                'You must provide accurate contact information.',
+                style: TextStyle(fontSize: 12),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: <Widget>[
+                  const Text('Do You Agree?',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(width: 5),
+                  Checkbox(
+                    value: isAgreed,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isAgreed = value!;
+                      });
+                    },
                   ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: registerShopOwner,
+                child: const Text('Register'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.yellow[700],
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
+  // Method to build text fields
   Widget _buildTextField({
     required TextEditingController controller,
     required String labelText,
@@ -301,55 +326,83 @@ class _ShopOwnerRegistrationState extends State<ShopOwnerRegistration> {
     IconData? icon,
     bool obscureText = false,
     FormFieldValidator<String>? validator,
-    TextInputType? keyboardType,
+    TextInputType keyboardType = TextInputType.text,
+    int maxLines = 1,
   }) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          prefixIcon: icon != null ? Icon(icon, color: Colors.blue) : null,
-          labelText: labelText,
-          hintText: hintText,
-          border: OutlineInputBorder(),
-        ),
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        validator: validator,
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        border: OutlineInputBorder(),
+        prefixIcon: icon != null ? Icon(icon) : null,
       ),
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      validator: validator,
     );
   }
 
+  // Method to build dropdown fields
   Widget _buildDropdownField({
     required String labelText,
     required String hintText,
     required String? value,
     required List<String> items,
     IconData? icon,
-    ValueChanged<String?>? onChanged,
+    required ValueChanged<String?> onChanged, 
     FormFieldValidator<String>? validator,
   }) {
-    return Card(
-      elevation: 4,
-      margin: const EdgeInsets.symmetric(vertical: 8),
-      child: DropdownButtonFormField<String>(
-        decoration: InputDecoration(
-          prefixIcon: icon != null ? Icon(icon, color: Colors.blue) : null,
-          labelText: labelText,
-          hintText: hintText,
-          border: OutlineInputBorder(),
-        ),
-        value: value,
-        items: items.map((item) {
-          return DropdownMenuItem<String>(
-            value: item,
-            child: Text(item),
-          );
-        }).toList(),
-        onChanged: onChanged,
-        validator: validator,
+    return DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        border: OutlineInputBorder(),
       ),
+      value: value,
+      items: items.map<DropdownMenuItem<String>>((String item) {
+        return DropdownMenuItem<String>(
+          value: item,
+          child: Text(item),
+        );
+      }).toList(),
+      onChanged: onChanged,
+      validator: (value) {
+        if (value == null) {
+          return 'Please select an option';
+        }
+        return null;
+      },
+    );
+  }
+
+  // Method to build dropdown for selecting category
+  Widget _buildCategoryDropdown() {
+    return DropdownButtonFormField<String>(
+      decoration: InputDecoration(
+        labelText: 'Select Category',
+        border: OutlineInputBorder(),
+      ),
+      value: selectedCategory,
+      hint: const Text('Choose your category'),
+      items: categories.map<DropdownMenuItem<String>>((String category) {
+        return DropdownMenuItem<String>(
+          value: category,
+          child: Text(category),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedCategory = value; // Update selectedCategory
+        });
+      },
+      validator: (value) {
+        if (value == null) {
+          return 'Please select a category';
+        }
+        return null;
+      },
     );
   }
 }
